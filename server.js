@@ -16,6 +16,18 @@ app.get('/', (req, res) => {
   })
   
 
+  const UserRoute = require('./Api/Routes/Users.routes')
+  app.use('/UserApi',UserRoute)
+ 
+ 
+
+
+  const AdminRoute = require('./Api/Routes/Admin.routes')
+  app.use('/AdminApi',AdminRoute)
+ 
+ 
+
+
   mongoose.connect(MONGODB, /*We place this to remove warning*/{ useNewUrlParser:
     true, useUnifiedTopology: true }).then(()=>{
     console.log("Connected to MongoDB database")
@@ -27,4 +39,3 @@ app.get('/', (req, res) => {
   })
 
 
-  
