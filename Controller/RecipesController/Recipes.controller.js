@@ -123,11 +123,11 @@ const UpdateRecipe = (req,res)=>{
         message:" Recipe updated successfully",
 
       });
-           console.log("Recipe permission Data ",data)
+           
     }).catch(err=>{
         res.status(500).send({
             message:
-              err.message || "Some error occurred while updating Recipe Permissions"
+              err.message || "Some error occurred while updating Recipe"
           });
     })
 }
@@ -135,7 +135,7 @@ const UpdateRecipe = (req,res)=>{
 
 const ViewAllRecipe =async (req,res)=>{
    
-    const Data =  await Role.find();
+    const Data =  await Recipe.find();
   console.log(Data)
   res.status(200).send(
     {
