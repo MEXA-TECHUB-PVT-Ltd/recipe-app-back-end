@@ -90,5 +90,134 @@ const AdminSignIn= async (req,res)=>{
 
 
 
-module.exports = {createAdmin,AdminSignIn}
+
+const Admin_ResetPassword= async(req,res)=>{
+   
+    let Admindata = await Admin.findOne({AdminEmail:req.body.Email})
+    const responseType = {}
+    const generatedOtp = generateOTP();
+    console.log('Generated Otp',generateOTP)
+    if(Admindata){
+            let otpData = new OTP({
+            Email:req.body.Email,
+            Code: generatedOtp,
+            ExpireIn: new Date().getTime() + 300*1000,
+            PersonId: Admindata.id
+        })
+        console.log("user id ",Admindata.id)
+         otpData.save(otpData).
+         then( data => {
+           
+             console.log("OTP data saved successfully")
+          })
+          .catch(err => {
+            res.status(500).send({
+              message:
+                err.message || "Some error occurred while saving the otp"
+            });
+          });
+
+          try {
+            await sendMail({
+              to:req.body.Email,
+              OTP:generatedOtp,
+            });
+            res.status(200).send({
+                message: 'Please check your email for otp verification'
+              });
+             
+          } catch (error) {
+            res.status(500).send({
+                message: 'Unable to Send OTP, Please try again later'
+              });
+     
+
+          }
+
+
+    }else{
+        res.status(500).send({
+            message: "Some error occurred while saving the otp"
+          });
+       
+
+    }
+
+    res.status(200).json(responseType)
+}
+
+
+
+const Admin_ChangePassword= async (req,res)=>{
+  
+    const {PersonId,Email,Code,newPass}= req.body
+ 
+    let Otpdata = await OTP.find({PersonId,Email,Code})
+    const response={}
+     
+    if(Otpdata){
+       let currentTime = new Date().getTime()
+       let diff = Otpdata.expireIn - currentTime
+        
+       if(diff<0){
+        response.message = "Token Expire"
+        response.statusText= 'error'
+
+       }else{
+        response.message = "Otp receive successfully"
+        response.statusText= 'success'
+         
+        const AdminData = await Admin.findById(PersonId)
+        console.log(AdminData)
+        
+
+        Admin.findByIdAndUpdate({id:PersonId}, {
+            $set:{AdminPass:newPass}
+        })
+        .then(data => {
+          if (!data) {
+            res.status(404).send({
+              message: `Cannot update Admin Pass with id=${AdminData.id}. Maybe Admin was not found!`
+            });
+          } else res.send(
+            {
+             message1: response.message,
+             status: response.statusText,
+             message: "Admin pass changes successfully.",
+         
+         });
+        })
+        .catch(err => {
+          res.status(500).send({
+            message: "Error updating Admin Pass with id=" + AdminData.id
+          });
+        });
+
+        
+       }
+      
+    }else{
+            response.message = "Invalid Otp"
+            response.statusText = "error"
+        res.status(500).send({
+             message:response.message,
+             status:response.statusText
+          });
+     
+    }
+
+
+}
+
+
+
+
+
+module.exports = {
+    createAdmin,
+    AdminSignIn,
+    Admin_ResetPassword,
+    Admin_ChangePassword
+
+}
 
