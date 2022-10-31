@@ -27,10 +27,7 @@ const UserSchema=new mongoose.Schema({
         required:true,
        },
 
-   User_Location:{
-    type:String,
-    required:true,
-   },
+
 }
 )
 
