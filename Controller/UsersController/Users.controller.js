@@ -18,6 +18,10 @@ const createUser = async (req,res)=>{
         User_Preferences, 
         Matter_Type
     })
+    if (!req.body.UserName) {
+        res.status(400).send({ message: "Content can not be empty!" });
+        return;
+      }
 
     // save User into database
 

@@ -26,6 +26,10 @@ app.get('/', (req, res) => {
   app.use('/AdminApi',AdminRoute)
  
  
+  const RecipeRoute = require('./Api/Routes/Recipes.routes')
+  app.use('/RecipeApi',RecipeRoute)
+ 
+ 
 
 
   mongoose.connect(MONGODB, /*We place this to remove warning*/{ useNewUrlParser:

@@ -2,7 +2,7 @@ const express= require('express')
 const app= express()
 
 const UserController = require('../../Controller/UsersController/Users.controller')
-app.get('/CreateUser',UserController.createUser)
+app.post('/CreateUser',UserController.createUser)
 app.post('/LoginUser',UserController.UserSignIn)
 // app.post('/AdminChangePass',SuperAdminController.Admin_ChangePassword)
 // app.post('/AdminResetPass',SuperAdminController.Admin_ResetPassword)
