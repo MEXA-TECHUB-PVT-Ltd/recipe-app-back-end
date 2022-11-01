@@ -13,15 +13,15 @@ const RecipesSchema=new mongoose.Schema({
         required:true,
        },
       
-       Recipe_Image:{
+       Recipe_Image:[{
         type:String,
-        required:true,
-       },
+        default:[],
+       }],
      
-       Recipe_Video:{
+       Recipe_Video:[{
         type:String,
-        required:true,
-       },
+        default:[],
+       }],
         
 
      Recipe_Time:{
@@ -38,6 +38,11 @@ const RecipesSchema=new mongoose.Schema({
      Making_Procedure:{
         type:String,
         required:true,
+     },
+
+     noOfPersons:{
+      type:Number,
+      required:true,
      }
 
 

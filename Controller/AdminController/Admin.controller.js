@@ -9,13 +9,13 @@ const createAdmin = async (req,res)=>{
    
     console.log("create User Call")
    
-    const {AdminEmail,AdminPass,AdminUsernamel,AdminProfileImage,AdminDisplayName} = req.body
-    
+    const {AdminEmail,AdminPass,AdminUsername,AdminDisplayName} = req.body
+ 
     const admin= new Admin({
         AdminEmail,
         AdminPass,
-        AdminUsernamel,
-        AdminProfileImage,
+        AdminUsername,
+        AdminProfileImage:req.file.path,
         AdminDisplayName
     })
 
@@ -92,11 +92,16 @@ const AdminSignIn= async (req,res)=>{
 
 
 const Admin_ResetPassword= async(req,res)=>{
-   
+  if (!req.body.Email) {
+    res.status(400).send({ message: "Content can not be empty!" });
+    return;
+  }  
+
     let Admindata = await Admin.findOne({AdminEmail:req.body.Email})
-    const responseType = {}
+   
     const generatedOtp = generateOTP();
     console.log('Generated Otp',generateOTP)
+    console.log(Admindata)
     if(Admindata){
             let otpData = new OTP({
             Email:req.body.Email,
@@ -116,12 +121,13 @@ const Admin_ResetPassword= async(req,res)=>{
                 err.message || "Some error occurred while saving the otp"
             });
           });
-
+           
           try {
             await sendMail({
               to:req.body.Email,
               OTP:generatedOtp,
             });
+
             res.status(200).send({
                 message: 'Please check your email for otp verification'
               });
@@ -143,12 +149,12 @@ const Admin_ResetPassword= async(req,res)=>{
 
     }
 
-    res.status(200).json(responseType)
+    
 }
 
 
 
-const Admin_ChangePassword= async (req,res)=>{
+const Admin_OTPChangePassword= async (req,res)=>{
   
     const {PersonId,Email,Code,newPass}= req.body
  
@@ -171,7 +177,7 @@ const Admin_ChangePassword= async (req,res)=>{
         console.log(AdminData)
         
 
-        Admin.findByIdAndUpdate({id:PersonId}, {
+        Admin.findOneAndUpdate({id:PersonId}, {
             $set:{AdminPass:newPass}
         })
         .then(data => {
@@ -218,10 +224,10 @@ const ChangeWithConfirmPass = async (req,res)=>{
         return;
       }
 
-      let AdminData = await OTP.find({id,UserPass:OldPass})
-      console.log(AdminData)
+      let AdminData = await Admin.find({id,UserPass:OldPass})
+    
       if(AdminData){
-      Admin.findByIdAndUpdate({id:id}, {
+      Admin.findOneAndUpdate({id:id}, {
         $set:{AdminPass:newPass}
     })
     .then(data => {
@@ -253,8 +259,56 @@ const ChangeWithConfirmPass = async (req,res)=>{
 
 
 
+const ViewAdminDetails= async(req,res)=>{
+  const {id} = req.body
+  const Data = await Admin.findById(id)
+  if(Data){
+  res.status(200).send({
+    Data,
+    message:"Admin Found Successfully"
+  });
+}else{
+  res.status(500).send({
+    message:"Error Finding Admin"
+  });
+}
+}
 
 
+
+const updateAdminProfile = async(req,res)=>{
+  const {id, 
+    AdminEmail,
+    AdminDisplayName} = req.body
+  if (!req.body) {
+   res.status(400).send({ message: "Content can not be empty!" });
+   return;
+ }
+ 
+    if (!req.body) {
+         res.status(400).send({ message: "Content can not be empty!" });
+         return;
+       }
+ 
+       Admin.findByIdAndUpdate(id, {
+        AdminEmail,
+        AdminProfileImage:req.file.path,
+        AdminDisplayName
+     }).then(data=>{
+   res.status(200).send({
+     message:" Admin data updated successfully",
+
+   });
+        
+ }).catch(err=>{
+     res.status(500).send({
+         message:
+           err.message || "Some error occurred while updating Admin"
+       });
+ })
+
+
+}
 
 
 
@@ -264,7 +318,9 @@ module.exports = {
     createAdmin,
     AdminSignIn,
     Admin_ResetPassword,
-    Admin_ChangePassword
+    Admin_OTPChangePassword,
+    ChangeWithConfirmPass,
+    ViewAdminDetails,
+    updateAdminProfile
 
 }
-

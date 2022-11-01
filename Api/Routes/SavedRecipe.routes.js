@@ -3,6 +3,6 @@ const app= express()
 
 const RecipeController = require('../../Controller/SavedRecipeController/SavedRecipe.controller')
 app.post('/SaveRecipe',RecipeController.SaveRecipe)
-app.post('/ViewAllSavedRecipe',RecipeController.ViewAllSavedRecipe)
-
+app.get('/ViewAllSavedRecipe',RecipeController.ViewAllSavedRecipe)
+app.post('/DeleteSaveRecipe',RecipeController.DeleteSaveRecipe)
 module.exports= app

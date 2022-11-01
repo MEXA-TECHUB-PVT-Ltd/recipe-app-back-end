@@ -22,7 +22,7 @@ const UserSchema=new mongoose.Schema({
         required:true,
        },
 
-    Matter_Type:{
+    User_genere:{
         type:String,
         required:true,
        },

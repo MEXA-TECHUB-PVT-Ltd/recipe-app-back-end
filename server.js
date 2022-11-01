@@ -30,6 +30,8 @@ app.get('/', (req, res) => {
   app.use('/RecipeApi',RecipeRoute)
  
  
+
+
   const SavedRecipeRoute = require('./Api/Routes/SavedRecipe.routes')
   app.use('/SavedRecipeApi',SavedRecipeRoute)
  
@@ -40,6 +42,16 @@ app.get('/', (req, res) => {
   app.use('/LogsRoute',LogsRoute)
  
 
+
+
+  const CategoryRoute = require('./Api/Routes/Categories.routes')
+  app.use('/CategoryRoute',CategoryRoute)
+ 
+
+
+  const IngRoute = require('./Api/Routes/Ingredients.routes')
+  app.use('/IngApi',IngRoute)
+ 
 
 
   mongoose.connect(MONGODB, /*We place this to remove warning*/{ useNewUrlParser:

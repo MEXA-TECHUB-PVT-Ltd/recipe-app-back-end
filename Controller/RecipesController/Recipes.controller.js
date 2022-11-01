@@ -7,38 +7,60 @@ const CreateRecipe = (req,res)=>{
     const {
         Category_ID,
         Recipe_name,
-        Recipe_Image,
-        Recipe_Video, 
         Recipe_Time,
         IngredientList,
-        Making_Procedure} = req.body
+        Making_Procedure,
+        noOfPersons
+      } = req.body
     
         if (!req.body.Recipe_name) {
             res.status(400).send({ message: "Content can not be empty!" });
             return;
           }
 
+      
+       let RecipeImages= []
+       let RecipeVideo = []
+       let i=0,j=0
+
+       while (req.files['RecipeImage'][i]) {
+        RecipeImages.push(req.files['RecipeImage'][i].path)
+        i++;
+      }
+     
+      while (req.files['RecipeVideo'][j]) {
+        RecipeVideo.push(req.files['RecipeVideo'][j].path)
+        j++;
+      }
+
+
+      console.log(RecipeImages,RecipeVideo)
+    
 
     const recipe= new Recipe({
         Category_ID,
         Recipe_name,
-        Recipe_Image,
-        Recipe_Video, 
         Recipe_Time,
         IngredientList,
-        Making_Procedure
+        Making_Procedure,
+        noOfPersons:Number(noOfPersons)
     })
 
     // save User into database
 
 recipe.save(recipe)
   .then(data => {
+     let id= data.id
    console.log("data of recipe before adding Ingredients ",data)
-    Recipe.findOneAndUpdate(
-        { id: data.id },
-        {$push : { Recipe_Ingredients:   IngredientList }}
+    Recipe.findByIdAndUpdate(
+        id,
+        {$set : {
+           Recipe_Ingredients:   IngredientList,
+           Recipe_Image:RecipeImages,
+           Recipe_Video:RecipeVideo
+         }}
     ).then(data=>{
-        console.log("data of recipe after adding Ingredients ",data)
+        console.log("data of srecipe after adding Ingredients ",data)
       res.status(200).send({
       data,
       message:"recipe created Successfully",
@@ -101,8 +123,6 @@ const UpdateRecipe = (req,res)=>{
     const {
         id,
         Recipe_name,
-        Recipe_Image,
-        Recipe_Video, 
         Recipe_Time,
         IngredientList,
         Making_Procedure}  = req.body
@@ -112,13 +132,35 @@ const UpdateRecipe = (req,res)=>{
             return;
         }
 
-        Recipe.findByIdAndUpdate({id:id}, {
+        let RecipeImages= []
+        let RecipeVideo = []
+        let i=0,j=0
+ 
+        while (req.files['RecipeImage'][i]) {
+         RecipeImages.push(req.files['RecipeImage'][i].path)
+         i++;
+       }
+      
+       while (req.files['RecipeVideo'][j]) {
+         RecipeVideo.push(req.files['RecipeVideo'][j].path)
+         j++;
+       }
+ 
+ 
+       console.log(RecipeImages,RecipeVideo)
+     
+ 
+
+        Recipe.findByIdAndUpdate(id, {
             Recipe_name,
-            Recipe_Image,
-            Recipe_Video,
+            
             Recipe_Time,
             Making_Procedure,
-            $set : {   Recipe_Ingredients :  IngredientList }
+            $set : {  
+               Recipe_Ingredients :  IngredientList,
+               Recipe_Image:RecipeImages,
+               Recipe_Video:RecipeVideo,
+             }
         }).then(data=>{
       res.status(200).send({
         message:" Recipe updated successfully",
@@ -149,7 +191,9 @@ const ViewAllRecipe =async (req,res)=>{
 
 const ViewRecipe =async (req,res)=>{
     const {id} = req.body
+    console.log(id)
     const Data = await Recipe.findById(id)
+    console.log(Data)
     if(Data){
     res.status(200).send({
       Data,

@@ -1,10 +1,11 @@
 const express= require('express')
 const app= express()
-
+const  middleware  = require('../Middleware/FileUpload.middleware')
+const upload = middleware.upload
 const RecipeController = require('../../Controller/RecipesController/Recipes.controller')
-app.post('/CreateRecipe',RecipeController.CreateRecipe)
-app.post('/UpdateRecipe',RecipeController.UpdateRecipe)
+app.post('/CreateRecipe',upload.fields([{ name: 'RecipeImage', maxCount: 3 }, { name: 'RecipeVideo', maxCount: 3 }]),RecipeController.CreateRecipe)
+app.post('/UpdateRecipe',upload.fields([{ name: 'RecipeImage', maxCount: 3 }, { name: 'RecipeVideo', maxCount: 3 }]),RecipeController.UpdateRecipe)
 app.post('/DeleteRecipe',RecipeController.DeleteRecipe)
-app.post('/ViewAllRecipe',RecipeController.ViewAllRecipe)
+app.get('/ViewAllRecipe',RecipeController.ViewAllRecipe)
 app.post('/ViewRecipe',RecipeController.ViewRecipe)
 module.exports= app

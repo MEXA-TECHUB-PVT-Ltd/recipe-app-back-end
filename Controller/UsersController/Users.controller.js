@@ -4,19 +4,20 @@ const Otp_schema = require('../../Model/OtpModel/Otp.model')
 const OTP = Otp_schema.Otp_schema
 const { generateOTP } = require('../../Utils/Services/Otp')
 const { sendMail } = require('../../Utils/Services/Mail')
+const ResponseCode = require('../../Utils/Responses/ResponseCode')
 
 const createUser = async (req,res)=>{
    
     console.log("create User Call")
    
-    const {UserName,UserPass,UserEmail,User_Preferences, Matter_Type} = req.body
+    const {UserName,UserPass,UserEmail,User_Preferences, User_genere} = req.body
     
     const user= new User({
         UserName,
         UserPass,
         UserEmail,
         User_Preferences, 
-        Matter_Type
+        User_genere
     })
     if (!req.body.UserName) {
         res.status(400).send({ message: "Content can not be empty!" });
@@ -99,7 +100,7 @@ const UserSignIn= async (req,res)=>{
     const User_ResetPassword= async(req,res)=>{
    
         let Userdata = await User.findOne({UserEmail:req.body.Email})
-        const responseType = {}
+        
         const generatedOtp = generateOTP();
         console.log('Generated Otp',generateOTP)
         if(Userdata){
@@ -107,7 +108,7 @@ const UserSignIn= async (req,res)=>{
                 Email:req.body.Email,
                 Code: generatedOtp,
                 ExpireIn: new Date().getTime() + 300*1000,
-                PersonId: User.id
+                PersonId: Userdata.id
             })
             console.log("user id ",Userdata.id)
              otpData.save(otpData).
@@ -148,7 +149,7 @@ const UserSignIn= async (req,res)=>{
     
         }
     
-        res.status(200).json(responseType)
+     
     }
     
     
@@ -171,18 +172,15 @@ const UserSignIn= async (req,res)=>{
            }else{
             response.message = "Otp receive successfully"
             response.statusText= 'success'
-             
-            const UserData = await User.findById(PersonId)
-            console.log(UserData)
-            
+          
     
-            User.findByIdAndUpdate({id:PersonId}, {
+            User.findOneAndUpdate({id:PersonId}, {
                 $set:{UserPass:newPass}
             })
             .then(data => {
               if (!data) {
                 res.status(404).send({
-                  message: `Cannot update User Pass with id=${UserData.id}. Maybe User was not found!`
+                  message: `Cannot update User Pass with id=${PersonId}. Maybe User was not found!`
                 });
               } else res.send(
                 {
@@ -194,7 +192,7 @@ const UserSignIn= async (req,res)=>{
             })
             .catch(err => {
               res.status(500).send({
-                message: "Error updating User Pass with id=" + UserData.id
+                message: "Error updating User Pass with id=" + PersonId
               });
             });
     
@@ -223,10 +221,10 @@ const UserSignIn= async (req,res)=>{
             return;
           }
 
-          let UserData = await OTP.find({id,UserPass:OldPass})
+          let UserData = await User.find({id,UserPass:OldPass})
           console.log(UserData)
           if(UserData){
-          User.findByIdAndUpdate({id:id}, {
+          User.findOneAndUpdate({id:id}, {
             $set:{UserPass:newPass}
         })
         .then(data => {
@@ -258,6 +256,97 @@ const UserSignIn= async (req,res)=>{
     
     
     
+    const ViewUser = async(req,res)=>{
+      const {id} = req.body
+      const Data = await User.findById(id)
+      if(Data){
+      res.status(200).send({
+        Data,
+        message:"User Found Successfully"
+      });
+    }else{
+      res.status(500).send({
+        message:"Error Finding User"
+      });
+    }
+    }
+
+
+
+
+  const UpdateUser = async(req,res)=>{
+     const {id,UserEmail,User_Preferences,User_genere} = req.body
+     if (!req.body) {
+      res.status(400).send({ message: "Content can not be empty!" });
+      return;
+    }
+    
+       if (!req.body) {
+            res.status(400).send({ message: "Content can not be empty!" });
+            return;
+          }
+    
+          User.findByIdAndUpdate(id, {
+            UserEmail,
+            User_Preferences,
+            User_genere
+        }).then(data=>{
+      res.status(200).send({
+        message:" User updated successfully",
+
+      });
+           
+    }).catch(err=>{
+        res.status(500).send({
+            message:
+              err.message || "Some error occurred while updating User"
+          });
+    })
+
+
+  }
+
+
+  const DeleteUserAccount=async(req,res)=>{
+    const {id} = req.body;
+    console.log(id)
+     
+    if (!req.body.id) {
+        res.status(400).send({ message: "User Id required to delete data" });
+        return;
+      }
+
+
+    User.findByIdAndRemove(id)
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `Cannot delete User with id=${id}. Maybe User was not found!`
+          });
+        } else {
+          res.send({
+            message: "User deleted successfully!"
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete User with id=" + id
+        });
+      });
+  }
+
+  const  ViewAllUsers = async (req,res)=>{
+     
+    const Data =  await User.find();
+  console.log(Data)
+  res.status(200).send(
+    {
+        Data,
+        message:"User data found successfully"
+    }
+     ) 
+  }
 
 
 module.exports = {
@@ -265,6 +354,10 @@ module.exports = {
     UserSignIn,
     User_ChangePassword,
     User_ResetPassword,
-    ChangeWithConfirmPass
+    ChangeWithConfirmPass,
+    DeleteUserAccount,
+    ViewUser,
+    ViewAllUsers,
+    UpdateUser
 }
 
