@@ -26,6 +26,7 @@ const CreateCategory = (req,res)=>{
 category.save(category)
   .then(data => {
     res.status(200).send({
+          data,
           message:"Category Data added successfully",
           resCode: ResponseCode.DATA_ADDED_SUCCESSFULLY
       });
@@ -86,7 +87,7 @@ const UpdateCategory = (req,res)=>{
             return;
         }
 
-        Category.findByIdAndUpdate({id:id}, {
+        Category.findByIdAndUpdate(id, {
             Category_name,
             Recipe_Country,
             Recipe_type
@@ -120,7 +121,7 @@ const ViewAllCategories =async (req,res)=>{
 
 const ViewCategory =async (req,res)=>{
     const {id} = req.body
-    const Data = await Recipe.findById(id)
+    const Data = await Category.findById(id)
     if(Data){
     res.status(200).send({
       Data,

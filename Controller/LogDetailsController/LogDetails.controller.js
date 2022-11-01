@@ -5,16 +5,15 @@ const ResponseCode = require('../../Utils/Responses/ResponseCode')
 const createLogUser = async (req,res)=>{
    
     console.log("create User Call")
-   
+    if (!req.body) {
+      res.status(400).send({ message: "Content can not be empty!" });
+      return;
+    }
     const {LogUser_ID,LogUsername,Log_UserPass,Log_UserTable,User_Location} = req.body
     
     const log= new Logs({
         LogUser_ID,LogUsername,Log_UserPass,Log_UserTable,User_Location
     })
-    if (!req.body.UserName) {
-        res.status(400).send({ message: "Content can not be empty!" });
-        return;
-      }
 
     // save User into database
 
@@ -35,6 +34,37 @@ log.save(log)
   });
    
    
+}
+
+
+
+const DeleteLoginDetailsAccount=async(req,res)=>{
+  const {id} = req.body;
+  console.log(id)
+   
+  if (!req.body.id) {
+      res.status(400).send({ message: "Log User Id required to delete data" });
+      return;
+    }
+
+
+  Logs.findByIdAndRemove(id)
+    .then(data => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot delete LOg User with id=${id}. Maybe Log User was not found!`
+        });
+      } else {
+        res.send({
+          message: "User deleted successfully!"
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete User with id=" + id
+      });
+    });
 }
 
 
@@ -112,8 +142,8 @@ const LogUserSignIn= async (req,res)=>{
 
     const UpdateLogUserProfile = async(req,res)=>{
         const {id, User_Location} = req.body
-        Logs.findByIdAndUpdate({LogUser_ID:id},{
-            User_Location
+        Logs.findOneAndUpdate({LogUser_ID:id},{
+            $set:{User_Location:User_Location}
         }).then(data=>{
             res.status(200).send({
              
@@ -132,10 +162,27 @@ const LogUserSignIn= async (req,res)=>{
         })
     }
 
+
+    const ViewAllLogs= async(req,res)=>{
+   
+        const Data =  await Logs.find();
+      console.log(Data)
+      res.status(200).send(
+        {
+            Data,
+            message:"LogDetails data found successfully"
+        }
+         ) 
+      
+    
+    }
+
 module.exports = {
     createLogUser,
     LogUserSignIn,
     UpdateUserPass,
-    UpdateLogUserProfile
+    UpdateLogUserProfile,
+    DeleteLoginDetailsAccount,
+    ViewAllLogs
     
 }
