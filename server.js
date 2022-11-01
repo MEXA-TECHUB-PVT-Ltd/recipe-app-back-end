@@ -36,6 +36,12 @@ app.get('/', (req, res) => {
 
 
 
+  const LogsRoute = require('./Api/Routes/LoginDetails.routes')
+  app.use('/LogsRoute',LogsRoute)
+ 
+
+
+
   mongoose.connect(MONGODB, /*We place this to remove warning*/{ useNewUrlParser:
     true, useUnifiedTopology: true }).then(()=>{
     console.log("Connected to MongoDB database")
