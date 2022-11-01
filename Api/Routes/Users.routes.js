@@ -6,7 +6,5 @@ app.post('/CreateUser',UserController.createUser)
 app.post('/LoginUser',UserController.UserSignIn)
 app.post('/UserChangePass',UserController.User_ChangePassword)
  app.post('/UserResetPass',UserController.User_ResetPassword)
-// app.post('/UpdateAdminData',SuperAdminController.UpdateAdminProfile)
-// app.post('/LogoutAdmin',SuperAdminController.LogOutAdmin)
-// app.post('/viewAdminProfile',SuperAdminController.ViewProfileData)
+app.post('/ChangeWithConfirmPass',UserController.ChangeWithConfirmPass)
 module.exports= app

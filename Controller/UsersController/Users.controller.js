@@ -213,6 +213,48 @@ const UserSignIn= async (req,res)=>{
     
     
     }
+
+
+ const ChangeWithConfirmPass = async (req,res)=>{
+        const response={}
+        const {id,OldPass,newPass}= req.body
+        if (!req.body) {
+            res.status(400).send({ message: "Content can not be empty!" });
+            return;
+          }
+
+          let UserData = await OTP.find({id,UserPass:OldPass})
+          console.log(UserData)
+          if(UserData){
+          User.findByIdAndUpdate({id:id}, {
+            $set:{UserPass:newPass}
+        })
+        .then(data => {
+          if (!data) {
+            res.status(404).send({
+              message: `Cannot update User Pass with id=${UserData.id}. Maybe User was not found!`
+            });
+          } else res.send(
+            {
+             message1: response.message,
+             status: response.statusText,
+             message: "User pass changes successfully.",
+         
+         });
+        })
+        .catch(err => {
+          res.status(500).send({
+            message: "Error updating User Pass with id=" + UserData.id
+          });
+        });
+    }else{
+        res.status(500).send({
+            message: "Incorrect Old Password Entered"
+          });  
+    }
+        
+        
+    }
     
     
     
@@ -222,6 +264,7 @@ module.exports = {
     createUser,
     UserSignIn,
     User_ChangePassword,
-    User_ResetPassword
+    User_ResetPassword,
+    ChangeWithConfirmPass
 }
 

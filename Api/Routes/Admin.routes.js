@@ -5,8 +5,7 @@ const AdminController = require('../../Controller/AdminController/Admin.controll
 app.post('/CreateAdmin',AdminController.createAdmin)
 app.post('/LoginAdmin',AdminController.AdminSignIn)
 app.post('/AdminChangePass',AdminController.Admin_ChangePassword)
- app.post('/AdminResetPass',AdminController.Admin_ResetPassword)
-// app.post('/UpdateAdminData',SuperAdminController.UpdateAdminProfile)
-// app.post('/LogoutAdmin',SuperAdminController.LogOutAdmin)
-// app.post('/viewAdminProfile',SuperAdminController.ViewProfileData)
-module.exports= app
+app.post('/AdminResetPass',AdminController.Admin_ResetPassword)
+app.post('/ChangeWithConfirmPass',AdminController.Admin_ChangePassword)
+
+ module.exports= app
