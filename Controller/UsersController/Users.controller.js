@@ -1,9 +1,5 @@
 const UserSchema = require('../../Model/UserModel/User.model')
 const User = UserSchema.User_schema
-const Otp_schema = require('../../Model/OtpModel/Otp.model')
-const OTP = Otp_schema.Otp_schema
-const { generateOTP } = require('../../Utils/Services/Otp')
-const { sendMail } = require('../../Utils/Services/Mail')
 const ResponseCode = require('../../Utils/Responses/ResponseCode')
 
 const createUser = async (req,res)=>{
