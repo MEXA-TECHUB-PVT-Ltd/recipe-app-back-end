@@ -21,6 +21,8 @@ const CreateCategory = (req,res)=>{
         Recipe_type
     })
 
+    
+
     // save category into database
 
 category.save(category)
@@ -134,11 +136,21 @@ const ViewCategory =async (req,res)=>{
   }
 }
 
+const CountCategories=async (req,res)=>{
+  const Count =await  Category.countDocuments()
+  res.status(200).send({
+     Count,
+    message:"Successfull"
+  });
+}
+
+
 
 module.exports = {
   CreateCategory,
   UpdateCategory,
   DeleteCategory,
   ViewAllCategories,
-  ViewCategory
+  ViewCategory,
+  CountCategories
 }

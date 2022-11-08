@@ -71,7 +71,7 @@ const AdminSignIn= async (req,res)=>{
 
           if(user.AdminPass== AdminPass){
             res.status(200).send({
-               user,
+                user,
                 message:"Admin account Login Successfully",
                 resCode:ResponseCode.LOGIN_SUCCESSFULL
               
@@ -112,7 +112,6 @@ const Admin_ResetPassword= async(req,res)=>{
         console.log("user id ",Admindata.id)
          otpData.save(otpData).
          then( data => {
-           
              console.log("OTP data saved successfully")
           })
           .catch(err => {
@@ -126,15 +125,28 @@ const Admin_ResetPassword= async(req,res)=>{
             await sendMail({
               to:req.body.Email,
               OTP:generatedOtp,
-            });
-
-            res.status(200).send({
-                message: 'Please check your email for otp verification'
+            }).then(data=>{
+              res.status(200).send({
+                message: 'Please check your email for otp verification',
+                resCode: ResponseCode.SUCCESSFULL
               });
+            }).catch(err=>{
+              res.status(500).send({
+                message: 'TimeOut Otp generation, try again later',
+                resCode: ResponseCode.FAILED
+              });
+     
+
+            }
+
+            )
+
+            
              
           } catch (error) {
             res.status(500).send({
-                message: 'Unable to Send OTP, Please try again later'
+                message: 'Unable to Send OTP, Please try again later',
+                resCode: ResponseCode.FAILED
               });
      
 
@@ -156,9 +168,9 @@ const Admin_ResetPassword= async(req,res)=>{
 
 const Admin_OTPChangePassword= async (req,res)=>{
   
-    const {PersonId,Email,Code,newPass}= req.body
+    const {Email,Code,newPass}= req.body
  
-    let Otpdata = await OTP.find({PersonId,Email,Code})
+    let Otpdata = await OTP.findOne({Email,Code})
     const response={}
      
     if(Otpdata){
@@ -173,11 +185,11 @@ const Admin_OTPChangePassword= async (req,res)=>{
         response.message = "Otp receive successfully"
         response.statusText= 'success'
          
-        const AdminData = await Admin.findById(PersonId)
-        console.log(AdminData)
+        const AdminData = await Admin.findById(Otpdata.PersonId)
+        console.log("here is ",AdminData)
         
 
-        Admin.findOneAndUpdate({id:PersonId}, {
+        Admin.findOneAndUpdate({id:Otpdata.PersonId}, {
             $set:{AdminPass:newPass}
         })
         .then(data => {
@@ -190,12 +202,14 @@ const Admin_OTPChangePassword= async (req,res)=>{
              message1: response.message,
              status: response.statusText,
              message: "Admin pass changes successfully.",
+             resCode:ResponseCode.SUCCESSFULL
          
          });
         })
         .catch(err => {
           res.status(500).send({
-            message: "Error updating Admin Pass with id=" + AdminData.id
+            message: "Error updating Admin Pass with id=" + AdminData.id,
+            resCode:ResponseCode.FAILED
           });
         });
 

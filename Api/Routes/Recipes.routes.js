@@ -8,4 +8,5 @@ app.post('/UpdateRecipe',upload.fields([{ name: 'RecipeImage', maxCount: 3 }, { 
 app.post('/DeleteRecipe',RecipeController.DeleteRecipe)
 app.get('/ViewAllRecipe',RecipeController.ViewAllRecipe)
 app.post('/ViewRecipe',RecipeController.ViewRecipe)
+app.get('/CountRecipe',RecipeController.CountRecipes)
 module.exports= app

@@ -39,6 +39,14 @@ user.save(user)
    
 }
 
+const CountUsers=async (req,res)=>{
+  const Count =await  User.countDocuments()
+  res.status(200).send({
+     Count,
+    message:"Successfull"
+  });
+}
+
     
     
     
@@ -109,6 +117,7 @@ module.exports = {
     createUser,
     ViewUser,
     ViewAllUsers,
-    UpdateUser
+    UpdateUser,
+    CountUsers
 }
 

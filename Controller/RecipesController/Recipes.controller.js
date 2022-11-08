@@ -208,11 +208,21 @@ const ViewRecipe =async (req,res)=>{
 
 
 
+const CountRecipes=async (req,res)=>{
+  const Count =await  Recipe.countDocuments()
+  res.status(200).send({
+     Count,
+    message:"Successfull"
+  });
+}
+
+
 
 module.exports = {
     CreateRecipe,
     DeleteRecipe,
     UpdateRecipe,
     ViewAllRecipe,
-    ViewRecipe
+    ViewRecipe,
+    CountRecipes
 }
